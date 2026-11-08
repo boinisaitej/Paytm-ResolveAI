@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Send,
   Bot,
   CheckCircle2,
   AlertTriangle,
-  Clock,
-  ArrowRight,
-  Shield,
-  Layers,
+  RefreshCw,
+  User,
   Sparkles,
   Terminal,
-  RefreshCw,
-  CreditCard,
-  User,
-  Store,
-  FileCheck,
-  ChevronRight,
+  Shield,
+  Layers,
   Languages,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
-import { Agent, WorkflowResult, ExecutionStep } from '../types';
+import { Agent, WorkflowResult } from '../types';
 import { runOrchestrator, actionApproval } from '../services/api';
 
 interface AiWorkspaceProps {
@@ -34,6 +32,76 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
   const [isLoading, setIsLoading] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState<WorkflowResult | null>(null);
   const [approvalActioning, setApprovalActioning] = useState<string | null>(null);
+
+  // Voice Query State
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        setInputMessage(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      alert('Speech Recognition is not supported by your browser. Please try Chrome or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      // Set language for speech recognition
+      const langMap = { en: 'en-IN', hi: 'hi-IN', te: 'te-IN' };
+      recognitionRef.current.lang = langMap[selectedLanguage];
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const speakResponse = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap = { en: 'en-IN', hi: 'hi-IN', te: 'te-IN' };
+    utterance.lang = langMap[selectedLanguage];
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const handleSend = async (customPrompt?: string) => {
     const textToSend = customPrompt || inputMessage;
@@ -142,7 +210,7 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
       <div className="flex-1 flex flex-col bg-white border-r border-slate-200 overflow-hidden">
         {/* Scenario Quick Pills */}
         <div className="p-3 bg-slate-50/80 border-b border-slate-200 flex items-center space-x-2 overflow-x-auto text-xs shrink-0">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Demo Scenarios:</span>
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Scenarios:</span>
           <button
             onClick={() => {
               const msg = "My ₹1,500 payment was deducted, but the merchant hasn't received the money.";
@@ -200,7 +268,7 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
                   <span>Autonomous Multi-Agent Graph Collaborating...</span>
                 </div>
                 <div className="text-[11px] text-slate-600">
-                  CustomerSupport classifies intent $\to$ PaymentInvestigation queries Azure SQL $\to$ MerchantOps checks Soundbox $\to$ Operations creates ticket & verifies.
+                  CustomerSupport classifies intent &rarr; PaymentInvestigation queries Azure SQL &rarr; MerchantOps checks Soundbox &rarr; Operations creates ticket & verifies.
                 </div>
               </div>
             </div>
@@ -217,17 +285,31 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
                 <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 max-w-2xl text-xs text-slate-800 shadow-xs space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-[#002970] text-xs">Customer Support Agent Response</span>
+                      <span className="font-bold text-[#002970] text-xs">Customer Support Agent (LLM Generated)</span>
                       <span className="text-[9px] bg-blue-100 text-[#002970] font-mono px-2 py-0.5 rounded-full font-semibold">
                         Grounded in NPCI TAT Policy
                       </span>
                     </div>
-                    {activeWorkflow.all_verified && (
-                      <span className="flex items-center space-x-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Self-Verified</span>
-                      </span>
-                    )}
+
+                    <div className="flex items-center space-x-2">
+                      {/* Voice TTS Button */}
+                      <button
+                        onClick={() => speakResponse(activeWorkflow.response_text)}
+                        title="Read response aloud"
+                        className={`p-1.5 rounded-full transition-all ${
+                          isSpeaking ? 'bg-blue-100 text-[#00BAF2] animate-pulse' : 'text-slate-400 hover:text-[#002970]'
+                        }`}
+                      >
+                        {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                      </button>
+
+                      {activeWorkflow.all_verified && (
+                        <span className="flex items-center space-x-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>Self-Verified</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <p className="text-slate-800 leading-relaxed text-xs">
@@ -298,12 +380,12 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
           )}
         </div>
 
-        {/* Input Bar with Language Selector */}
+        {/* Input Bar with Voice Toggle & Language Selector */}
         <div className="p-4 bg-white border-t border-slate-200">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-1.5 text-xs text-slate-500 font-medium">
               <Languages className="w-3.5 h-3.5 text-[#00BAF2]" />
-              <span>Response Language:</span>
+              <span>Language:</span>
             </div>
             <div className="flex items-center space-x-1 bg-slate-100 p-0.5 rounded-lg text-xs">
               {(['en', 'hi', 'te'] as const).map((lang) => (
@@ -323,12 +405,25 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Voice Input Microphone Button */}
+            <button
+              onClick={toggleVoiceInput}
+              title={isListening ? 'Stop listening' : 'Start speaking your complaint'}
+              className={`p-2.5 rounded-lg border transition-all flex items-center justify-center shrink-0 ${
+                isListening
+                  ? 'bg-rose-500 text-white border-rose-600 animate-pulse shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
+              }`}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-[#00BAF2]" />}
+            </button>
+
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask a question or enter customer complaint..."
+              placeholder={isListening ? 'Listening to voice query...' : 'Ask a question or enter customer complaint...'}
               disabled={isLoading}
               className="flex-1 px-4 py-2.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00BAF2]/30 focus:border-[#00BAF2] text-slate-900 disabled:opacity-50"
             />
@@ -426,7 +521,7 @@ export const AiWorkspacePage: React.FC<AiWorkspaceProps> = ({ agents, onApproval
               <Layers className="w-8 h-8 mx-auto text-slate-300" />
               <div>No active execution in progress.</div>
               <div className="text-[11px] text-slate-500">
-                Click "Run Hackathon Scenario" or dispatch a message to stream live agent events.
+                Click "Run Hackathon Scenario", speak via microphone, or dispatch a message.
               </div>
             </div>
           )}
