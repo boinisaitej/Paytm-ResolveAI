@@ -9,6 +9,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.orchestrator import router as orchestrator_router
+from app.api.tickets import router as tickets_router
+from app.api.transactions import router as transactions_router
+from app.api.merchants import router as merchants_router
+from app.api.approvals import router as approvals_router
+from app.api.analytics import router as analytics_router
+from app.api.activity_logs import router as activity_logs_router
+
 from app.core.config import settings
 from app.core.exceptions import (
     ResolveAIException,
@@ -37,14 +45,14 @@ def create_app() -> FastAPI:
     """Factory function to build and configure the FastAPI instance."""
     app = FastAPI(
         title=settings.app_name,
-        description="Autonomous AI Teammates for Payment Support and Merchant Operations",
+        description="Autonomous AI Teammates for Payment Support and Merchant Operations (Paytm AI Hackathon Hyderabad)",
         version="1.0.0",
         docs_url="/docs" if settings.debug or settings.app_env == "development" else None,
         redoc_url="/redoc" if settings.debug or settings.app_env == "development" else None,
         lifespan=lifespan,
     )
 
-    # Configure CORS
+    # Configure CORS for Vite React frontend
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -57,8 +65,15 @@ def create_app() -> FastAPI:
     app.add_exception_handler(ResolveAIException, resolveai_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)
 
-    # Register Health Routes
+    # Register API Route Blueprints
     app.include_router(health_router)
+    app.include_router(orchestrator_router)
+    app.include_router(tickets_router)
+    app.include_router(transactions_router)
+    app.include_router(merchants_router)
+    app.include_router(approvals_router)
+    app.include_router(analytics_router)
+    app.include_router(activity_logs_router)
 
     return app
 
