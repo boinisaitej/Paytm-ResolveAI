@@ -44,4 +44,7 @@ dist-ssr/
 *.log
 logs/
 ~$*
+deploy.zip
+deploy_package/
+
 

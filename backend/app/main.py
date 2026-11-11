@@ -5,7 +5,7 @@ Entry point for the FastAPI application.
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
@@ -18,6 +18,11 @@ from app.api.analytics import router as analytics_router
 from app.api.activity_logs import router as activity_logs_router
 from app.api.knowledge import router as knowledge_router
 from app.api.settings import router as settings_router
+from app.api.intelligence import router as intelligence_router
+
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.core.exceptions import (
@@ -78,6 +83,38 @@ def create_app() -> FastAPI:
     app.include_router(activity_logs_router)
     app.include_router(knowledge_router)
     app.include_router(settings_router)
+    app.include_router(intelligence_router)
+
+    # Mount compiled frontend static build if available
+    possible_dirs = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "dist")),
+        os.path.abspath("frontend/dist"),
+        os.path.abspath("dist"),
+    ]
+    dist_dir = None
+    for p in possible_dirs:
+        if os.path.exists(p) and os.path.isfile(os.path.join(p, "index.html")):
+            dist_dir = p
+            break
+
+    if dist_dir:
+        assets_dir = os.path.join(dist_dir, "assets")
+        if os.path.exists(assets_dir):
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def serve_spa(full_path: str):
+            if full_path.startswith("api") or full_path in ["docs", "redoc", "openapi.json", "health"]:
+                raise HTTPException(status_code=404, detail="API route not found")
+            target_file = os.path.join(dist_dir, full_path)
+            if os.path.isfile(target_file):
+                return FileResponse(target_file)
+            index_file = os.path.join(dist_dir, "index.html")
+            if os.path.isfile(index_file):
+                return FileResponse(index_file)
+            raise HTTPException(status_code=404, detail="Page not found")
 
     return app
 

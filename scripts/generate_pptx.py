@@ -87,15 +87,15 @@ def build_presentation(output_path: str = "Paytm_ResolveAI_PitchDeck.pptx"):
     accent.line.fill.background()
 
     # Track badge
-    badge = s1.shapes.add_textbox(Inches(1.1), Inches(1.7), Inches(11.0), Inches(0.4))
+    badge = s1.shapes.add_textbox(Inches(1.1), Inches(1.5), Inches(11.0), Inches(0.4))
     p = badge.text_frame.paragraphs[0]
-    p.text = "TRACK: AUTONOMOUS MULTI-AGENT AI & FINTECH OPERATIONS"
+    p.text = "PAYTM BUILD FOR INDIA AI HACKATHON (HYDERABAD)  |  TRACK 3: AUTONOMOUS AI TEAMMATES"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = C_CYAN
 
     # Title
-    t_box = s1.shapes.add_textbox(Inches(1.1), Inches(2.1), Inches(11.0), Inches(1.3))
+    t_box = s1.shapes.add_textbox(Inches(1.1), Inches(1.9), Inches(11.0), Inches(1.2))
     p = t_box.text_frame.paragraphs[0]
     p.text = "Paytm ResolveAI"
     p.font.size = Pt(44)
@@ -103,28 +103,42 @@ def build_presentation(output_path: str = "Paytm_ResolveAI_PitchDeck.pptx"):
     p.font.color.rgb = C_WHITE
 
     # Subtitle
-    sub_box = s1.shapes.add_textbox(Inches(1.1), Inches(3.4), Inches(10.5), Inches(1.2))
+    sub_box = s1.shapes.add_textbox(Inches(1.1), Inches(3.1), Inches(10.5), Inches(1.1))
     p = sub_box.text_frame.paragraphs[0]
-    p.text = "Autonomous Multi-Agent AI Workforce for Payment Operations, Dispute Resolution & Merchant Excellence"
-    p.font.size = Pt(18)
-    p.font.bold = True
-    p.font.color.rgb = C_SLATE_LIGHT
-
-    # Secondary text
-    desc_box = s1.shapes.add_textbox(Inches(1.1), Inches(4.5), Inches(10.5), Inches(0.9))
-    p = desc_box.text_frame.paragraphs[0]
-    p.text = "A dual-tier enterprise architecture unifying 5 Autonomous AI Agents with 5 Human Application Roles (RBAC), built with Azure OpenAI Service (gpt-4o) and Azure AI Search RAG. 100% Unscripted & Dynamic."
-    p.font.size = Pt(13)
-    p.font.color.rgb = C_SLATE_MUTED
-
-    # Bottom Metadata Bar
-    meta_box = s1.shapes.add_textbox(Inches(1.1), Inches(6.1), Inches(11.0), Inches(0.7))
-    tf = meta_box.text_frame
-    p = tf.paragraphs[0]
-    p.text = "Lead Developer: Sai Teja Boini  |  Infrastructure: Azure OpenAI + Azure AI Search  |  Rule: Zero Hardcoding"
-    p.font.size = Pt(12)
+    p.text = "AI Teammates That Don't Just Respond — They Get the Job Done"
+    p.font.size = Pt(20)
     p.font.bold = True
     p.font.color.rgb = C_CYAN
+
+    # Secondary text
+    desc_box = s1.shapes.add_textbox(Inches(1.1), Inches(4.2), Inches(10.5), Inches(1.1))
+    p = desc_box.text_frame.paragraphs[0]
+    p.text = "An autonomous multi-agent workforce designed to handle customer service & payment operations end-to-end: understanding context, taking actions across banking ledgers & Soundbox telemetry, and escalating to humans only when authorization is required."
+    p.font.size = Pt(13)
+    p.font.color.rgb = C_SLATE_LIGHT
+
+    # Links Box Banner
+    link_box = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.1), Inches(5.6), Inches(11.0), Inches(1.2))
+    link_box.fill.solid()
+    link_box.fill.fore_color.rgb = RGBColor(15, 23, 42)
+    link_box.line.color.rgb = C_CYAN
+    link_box.line.width = Pt(1.5)
+
+    tb_link = s1.shapes.add_textbox(Inches(1.3), Inches(5.7), Inches(10.6), Inches(1.0))
+    tf_l = tb_link.text_frame
+    tf_l.word_wrap = True
+    p_link = tf_l.paragraphs[0]
+    p_link.text = "🌐 LIVE WORKING DEMO: https://boinisaitej.github.io/Paytm-ResolveAI/"
+    p_link.font.size = Pt(13)
+    p_link.font.bold = True
+    p_link.font.color.rgb = C_EMERALD
+
+    p_git = tf_l.add_paragraph()
+    p_git.text = "💻 GITHUB REPO: https://github.com/boinisaitej/Paytm-ResolveAI.git  |  Lead: Sai Teja Boini"
+    p_git.font.size = Pt(11)
+    p_git.font.bold = True
+    p_git.font.color.rgb = C_CYAN
+    p_git.space_before = Pt(4)
 
     # ==========================================
     # SLIDE 2: PROBLEM STATEMENT
@@ -508,9 +522,9 @@ def build_presentation(output_path: str = "Paytm_ResolveAI_PitchDeck.pptx"):
                "A transformative autonomous workforce demonstrating the next generation of fintech customer and merchant operations.", C_CYAN)
 
     sum_cards = [
-        ("Production Highlights", "• 5 Human Roles (RBAC enforced)\n• 5 Autonomous AI Specialist Agents\n• Multilingual STT (Hindi, Telugu, English)\n• Azure OpenAI + Hybrid Vector RAG\n• 100% Passed Tests & Zero Hardcoded Data", C_CYAN),
-        ("Evaluation Ready", "• Live Frontend running on http://127.0.0.1:5173\n• Live Backend running on http://127.0.0.1:8000\n• Switch roles via dropdown in top header\n• Test dispute investigation in under 15 seconds\n• Inspect real-time agent telemetry & token metrics", C_EMERALD),
-        ("Future AI Capabilities", "• Proactive Outage Clustering AI\n• Autonomous Cross-Agent Negotiation\n• Predictive SLA Auto-Rebalancing\n• Regional Voice Synthesized Audio Callbacks\n• Cross-Border FX Settlement Dispute Engine", C_BLUE)
+        ("Production Highlights", "• 5 Human Application Roles (RBAC)\n• 5 Autonomous AI Specialist Teammates\n• LangGraph State Graph Architecture\n• Vernacular Voice STT (Hindi, Telugu, English)\n• Zero Hardcoding — 100% Azure OpenAI RAG", C_CYAN),
+        ("Live Deployment Links", "🌐 Live Web Application:\nhttps://boinisaitej.github.io/Paytm-ResolveAI/\n\n💻 GitHub Open Source Repo:\nhttps://github.com/boinisaitej/Paytm-ResolveAI\n\n☁️ Azure Cloud Deployment:\nhttps://paytm-resolveai-app.azurewebsites.net", C_EMERALD),
+        ("Track 3 Shortlist USP", "• Doesn't just answer; executes end-to-end actions\n• Audits core banking & gateway logs (U69/U30)\n• Soundbox IoT diagnostics & field tickets\n• Escalates to humans ONLY for financial approvals\n• Full Telemetry & SLA Breach Predictor", C_BLUE)
     ]
 
     for idx, (title, desc, color) in enumerate(sum_cards):

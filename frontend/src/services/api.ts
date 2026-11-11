@@ -136,3 +136,28 @@ export async function getAgentsHealth(): Promise<any[]> {
   if (!res.ok) throw new Error(`Failed to get agents health: ${res.statusText}`);
   return res.json();
 }
+
+export async function getIncidentClusters(): Promise<any[]> {
+  const res = await fetch(`${API_BASE}/intelligence/incident-clusters`);
+  if (!res.ok) throw new Error(`Failed to get incident clusters: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getSlaPredictions(ticketId?: string): Promise<any> {
+  const url = ticketId 
+    ? `${API_BASE}/intelligence/sla-predictions?ticket_id=${encodeURIComponent(ticketId)}`
+    : `${API_BASE}/intelligence/sla-predictions`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to get SLA predictions: ${res.statusText}`);
+  return res.json();
+}
+
+export async function executeCrossAgentNegotiation(data: { transaction_amount: number; gateway_code: string; delay_days: number }): Promise<any> {
+  const res = await fetch(`${API_BASE}/intelligence/negotiate-resolution`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Failed to execute negotiation: ${res.statusText}`);
+  return res.json();
+}
