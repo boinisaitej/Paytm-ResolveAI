@@ -8,8 +8,14 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_health_overall_unconfigured():
+@patch("app.api.health.check_azure_openai_health")
+def test_health_overall_unconfigured(mock_aoai):
     """When Azure credentials are not set, /health returns pending_configuration with 200."""
+    mock_aoai.return_value = {
+        "status": "unconfigured",
+        "message": "Azure OpenAI endpoint or API key not configured.",
+        "connected": False,
+    }
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
@@ -19,8 +25,14 @@ def test_health_overall_unconfigured():
     assert data["services"]["azure_sql_database"]["status"] == "unconfigured"
 
 
-def test_health_azure_openai_unconfigured():
+@patch("app.api.health.check_azure_openai_health")
+def test_health_azure_openai_unconfigured(mock_aoai):
     """When Azure OpenAI is not configured, /health/azure-openai reports unconfigured."""
+    mock_aoai.return_value = {
+        "status": "unconfigured",
+        "message": "Azure OpenAI endpoint not configured.",
+        "connected": False,
+    }
     response = client.get("/health/azure-openai")
     assert response.status_code == 200
     data = response.json()

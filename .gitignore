@@ -40,6 +40,8 @@ dist-ssr/
 *.swp
 *.swo
 
-# Logs
+# Logs & Temp Office Files
 *.log
 logs/
+~$*
+

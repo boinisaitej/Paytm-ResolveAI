@@ -16,6 +16,8 @@ from app.api.merchants import router as merchants_router
 from app.api.approvals import router as approvals_router
 from app.api.analytics import router as analytics_router
 from app.api.activity_logs import router as activity_logs_router
+from app.api.knowledge import router as knowledge_router
+from app.api.settings import router as settings_router
 
 from app.core.config import settings
 from app.core.exceptions import (
@@ -45,7 +47,7 @@ def create_app() -> FastAPI:
     """Factory function to build and configure the FastAPI instance."""
     app = FastAPI(
         title=settings.app_name,
-        description="Autonomous AI Teammates for Payment Support and Merchant Operations (Paytm AI Hackathon Hyderabad)",
+        description="Autonomous AI Teammates for Payment Support and Merchant Operations",
         version="1.0.0",
         docs_url="/docs" if settings.debug or settings.app_env == "development" else None,
         redoc_url="/redoc" if settings.debug or settings.app_env == "development" else None,
@@ -74,6 +76,8 @@ def create_app() -> FastAPI:
     app.include_router(approvals_router)
     app.include_router(analytics_router)
     app.include_router(activity_logs_router)
+    app.include_router(knowledge_router)
+    app.include_router(settings_router)
 
     return app
 

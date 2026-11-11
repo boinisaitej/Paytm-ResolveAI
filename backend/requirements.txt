@@ -7,16 +7,17 @@ pydantic>=2.6.0,<3.0.0
 pydantic-settings>=2.2.0,<3.0.0
 python-dotenv>=1.0.0,<2.0.0
 
-# Database (Azure SQL & SQLAlchemy with pyodbc)
+# Database (PostgreSQL & Azure SQL with SQLAlchemy)
 sqlalchemy>=2.0.28,<3.0.0
+psycopg2-binary>=2.9.9,<3.0.0
 pyodbc>=5.1.0,<6.0.0
 
-# Microsoft Agent Framework & Azure AI
-agent-framework-core>=1.24.0,<2.0.0
-agent-framework-openai>=1.18.0,<2.0.0
-openai>=1.20.0,<2.0.0
+# Azure OpenAI & Azure AI & Storage
+openai>=1.20.0
 azure-identity>=1.15.0,<2.0.0
 azure-core>=1.30.0,<2.0.0
+azure-search-documents>=12.0.0,<13.0.0
+azure-storage-blob>=12.20.0,<13.0.0
 
 # Testing & Client HTTP
 pytest>=8.0.0,<10.0.0

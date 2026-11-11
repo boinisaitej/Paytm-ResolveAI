@@ -243,6 +243,28 @@ class ResolveAIRepository:
         _mem_store.agent_executions[execution_id] = execution
         return execution
 
+    def create_activity_log(
+        self,
+        task_id: str,
+        agent_name: str,
+        action_type: str,
+        tool_name: Optional[str] = None,
+        tool_input: Any = None,
+        tool_output: Any = None,
+        duration_ms: int = 0,
+        status: str = "SUCCESS",
+    ) -> Dict[str, Any]:
+        return self.record_agent_execution(
+            task_id=task_id,
+            agent_name=agent_name,
+            action_type=action_type,
+            tool_name=tool_name,
+            tool_input=tool_input,
+            tool_output=tool_output,
+            duration_ms=duration_ms,
+            status=status,
+        )
+
     def record_agent_handoff(self, task_id: str, from_agent: str, to_agent: str, reason: str, payload: Any = None) -> Dict[str, Any]:
         handoff_id = f"HOFF-{len(_mem_store.agent_handoffs) + 2001}"
         handoff = {

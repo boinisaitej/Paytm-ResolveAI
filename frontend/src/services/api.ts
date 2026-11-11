@@ -69,14 +69,14 @@ export async function getApprovals(statusFilter?: string): Promise<Approval[]> {
   return res.json();
 }
 
-export async function actionApproval(approvalId: string, action: 'APPROVE' | 'REJECT', comments?: string): Promise<Approval> {
+export async function actionApproval(approvalId: string, action: 'APPROVE' | 'REJECT', reviewedBy: string = 'Sai Teja Boini (EMP201)', comments?: string): Promise<Approval> {
   const res = await fetch(`${API_BASE}/approvals/${approvalId}/action`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action,
-      reviewed_by: 'EMP201',
-      comments: comments || `Actioned as ${action} via operations console`,
+      reviewed_by: reviewedBy,
+      comments: comments || `Actioned as ${action} via operations console by ${reviewedBy}`,
     }),
   });
   return res.json();
@@ -89,5 +89,50 @@ export async function getAnalyticsOverview(): Promise<any> {
 
 export async function getActivityLogs(limit: number = 30): Promise<ActivityLog[]> {
   const res = await fetch(`${API_BASE}/activity-logs?limit=${limit}`);
+  return res.json();
+}
+
+export async function queryKnowledge(query: string, topK: number = 3): Promise<any> {
+  const res = await fetch(`${API_BASE}/knowledge/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, top_k: topK }),
+  });
+  if (!res.ok) throw new Error(`Knowledge query failed: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getKnowledgeDocuments(): Promise<any[]> {
+  const res = await fetch(`${API_BASE}/knowledge/documents`);
+  if (!res.ok) throw new Error(`Failed to load knowledge documents: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getCloudKeys(): Promise<any> {
+  const res = await fetch(`${API_BASE}/settings/keys`);
+  if (!res.ok) throw new Error(`Failed to get cloud keys: ${res.statusText}`);
+  return res.json();
+}
+
+export async function updateCloudKeys(data: any): Promise<any> {
+  const res = await fetch(`${API_BASE}/settings/keys`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Failed to update keys: ${res.statusText}`);
+  return res.json();
+}
+
+export async function testCloudConnection(): Promise<any> {
+  const res = await fetch(`${API_BASE}/settings/test-connection`, {
+    method: 'POST',
+  });
+  return res.json();
+}
+
+export async function getAgentsHealth(): Promise<any[]> {
+  const res = await fetch(`${API_BASE}/settings/agents-health`);
+  if (!res.ok) throw new Error(`Failed to get agents health: ${res.statusText}`);
   return res.json();
 }

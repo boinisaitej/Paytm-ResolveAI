@@ -50,7 +50,7 @@ class ResolveAIApprovalWorkflow:
     def review_approval(
         approval_id: str,
         action: str,  # "APPROVE" or "REJECT"
-        reviewer_id: str = "EMP201",  # Vikram Reddy (Payment Ops Officer)
+        reviewer_id: str = "EMP201",  # Sai Teja Boini (Lead Payment Ops Officer)
         comments: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Executes human approval or rejection on a pending action."""

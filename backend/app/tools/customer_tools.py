@@ -88,3 +88,12 @@ def draft_customer_response(ticket_id: str, language: str = "en") -> str:
 def get_ticket(ticket_id: str) -> Optional[Dict[str, Any]]:
     """Fetches full support ticket details by ID."""
     return repository.get_ticket(ticket_id)
+
+
+def search_knowledge_base(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+    """RAG tool: Searches Azure AI Search and indexed policy documents for grounded rules.
+    
+    Grounds decisions in NPCI UPI turnaround guidelines, refund SOPs, and device manuals.
+    """
+    from app.services.resolveai_rag_service import ResolveAIRagService
+    return ResolveAIRagService.search_policy_knowledge(query, top_k=top_k)

@@ -14,6 +14,7 @@ import { ActivityLogsPage } from './pages/ActivityLogsPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { CustomerPortalPage } from './pages/CustomerPortalPage';
 
 import {
   getAgents,
@@ -24,7 +25,16 @@ import {
   getAnalyticsOverview,
   getActivityLogs,
 } from './services/api';
-import { Agent, Ticket, Transaction, Merchant, Approval, ActivityLog } from './types';
+import {
+  Agent,
+  Ticket,
+  Transaction,
+  Merchant,
+  Approval,
+  ActivityLog,
+  HumanRoleKey,
+  HUMAN_ROLES_CONFIG,
+} from './types';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState('workspace'); // Default to flagship AI Workspace
@@ -35,6 +45,84 @@ export function App() {
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [logs, setLogs] = useState<ActivityLog[]>([]);
+
+  // 5 Human Roles Management
+  const [activeRoleKey, setActiveRoleKey] = useState<HumanRoleKey>(() => {
+    return (localStorage.getItem('resolveai_role_key') as HumanRoleKey) || 'PAYMENT_ANALYST';
+  });
+
+  const activeRoleConfig = HUMAN_ROLES_CONFIG[activeRoleKey] || HUMAN_ROLES_CONFIG.PAYMENT_ANALYST;
+
+  // UI Adjustment & Customization States
+  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
+    const saved = localStorage.getItem('resolveai_sidebar_width');
+    return saved ? Number(saved) : 260;
+  });
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    const saved = localStorage.getItem('resolveai_sidebar_collapsed');
+    return saved === 'true';
+  });
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('resolveai_theme');
+    return (saved as 'light' | 'dark') || 'light';
+  });
+  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'hi' | 'te'>('en');
+
+  // Active Employee Profile (Derived from Active Role)
+  const [employeeName, setEmployeeName] = useState<string>(activeRoleConfig.name);
+  const [employeeRole, setEmployeeRole] = useState<string>(activeRoleConfig.roleTitle);
+
+  const handleRoleChange = (newRoleKey: HumanRoleKey) => {
+    setActiveRoleKey(newRoleKey);
+    localStorage.setItem('resolveai_role_key', newRoleKey);
+    const cfg = HUMAN_ROLES_CONFIG[newRoleKey];
+    if (cfg) {
+      setEmployeeName(cfg.name);
+      setEmployeeRole(cfg.roleTitle);
+      localStorage.setItem('resolveai_employee_name', cfg.name);
+      localStorage.setItem('resolveai_employee_role', cfg.roleTitle);
+      if (!cfg.allowedModules.includes(currentTab)) {
+        setCurrentTab(cfg.allowedModules[0] || 'overview');
+      }
+    }
+  };
+
+  // Apply Theme Class to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('resolveai_theme', theme);
+  }, [theme]);
+
+  // Persist Sidebar Preferences
+  const handleWidthChange = (newWidth: number) => {
+    setSidebarWidth(newWidth);
+    localStorage.setItem('resolveai_sidebar_width', String(newWidth));
+  };
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('resolveai_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const handleUpdateEmployee = (name: string, role: string) => {
+    setEmployeeName(name);
+    setEmployeeRole(role);
+    localStorage.setItem('resolveai_employee_name', name);
+    localStorage.setItem('resolveai_employee_role', role);
+  };
 
   const loadData = async () => {
     try {
@@ -84,21 +172,61 @@ export function App() {
     }
   };
 
+  const handleSelectTab = (tab: string) => {
+    if (tab === 'customer_portal') {
+      handleRoleChange('CUSTOMER');
+    } else {
+      setCurrentTab(tab);
+    }
+  };
+
+  // Render Customer Portal when in 'CUSTOMER' role
+  if (activeRoleKey === 'CUSTOMER') {
+    return (
+      <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+        <CustomerPortalPage
+          onSwitchToEmployee={() => handleRoleChange('PAYMENT_ANALYST')}
+          selectedLanguage={selectedLanguage}
+          onSelectLanguage={setSelectedLanguage}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 font-sans">
+    <div className={`flex h-screen w-screen overflow-hidden ${theme === 'dark' ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} font-sans`}>
+      {/* Resizable, Slidable & Collapsible Sidebar */}
       <Sidebar
         currentTab={currentTab}
-        onSelectTab={setCurrentTab}
+        onSelectTab={handleSelectTab}
         pendingApprovalsCount={pendingApprovalsCount}
+        width={sidebarWidth}
+        onWidthChange={handleWidthChange}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={handleToggleSidebar}
+        allowedModules={activeRoleConfig.allowedModules}
+        activeRoleName={activeRoleConfig.name}
+        activeRoleTitle={activeRoleConfig.roleTitle}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-200">
         <Header
           title={getPageTitle()}
           onRunDemo={() => setCurrentTab('workspace')}
+          onSwitchToCustomer={() => handleRoleChange('CUSTOMER')}
+          activeRoleKey={activeRoleKey}
+          onSelectRole={handleRoleChange}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+          selectedLanguage={selectedLanguage}
+          onSelectLanguage={setSelectedLanguage}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={handleToggleSidebar}
+          employeeName={employeeName}
+          employeeRole={employeeRole}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-0 transition-colors duration-200">
           {currentTab === 'overview' && (
             <OverviewPage
               analytics={analytics}
@@ -108,18 +236,42 @@ export function App() {
           )}
           {currentTab === 'teammates' && <AiTeammatesPage agents={agents} />}
           {currentTab === 'workspace' && (
-            <AiWorkspacePage agents={agents} onApprovalActioned={loadData} />
+            <AiWorkspacePage
+              agents={agents}
+              onApprovalActioned={loadData}
+              selectedLanguage={selectedLanguage}
+              onSelectLanguage={setSelectedLanguage}
+              employeeName={employeeName}
+              employeeRole={employeeRole}
+            />
           )}
           {currentTab === 'tasks' && <TasksPage />}
           {currentTab === 'support' && <CustomerSupportPage tickets={tickets} />}
           {currentTab === 'payments' && <PaymentInvestigationsPage transactions={transactions} />}
           {currentTab === 'merchants' && <MerchantManagementPage merchants={merchants} />}
           {currentTab === 'leads' && <SalesLeadsPage merchants={merchants} />}
-          {currentTab === 'approvals' && <ApprovalsPage approvals={approvals} onRefresh={loadData} />}
+          {currentTab === 'approvals' && (
+            <ApprovalsPage
+              approvals={approvals}
+              onRefresh={loadData}
+              employeeName={employeeName}
+              canApproveRefunds={activeRoleConfig.canApproveRefunds}
+            />
+          )}
           {currentTab === 'logs' && <ActivityLogsPage logs={logs} />}
           {currentTab === 'analytics' && <AnalyticsPage analytics={analytics} />}
           {currentTab === 'knowledge' && <KnowledgeBasePage />}
-          {currentTab === 'settings' && <SettingsPage />}
+          {currentTab === 'settings' && (
+            <SettingsPage
+              theme={theme}
+              onToggleTheme={handleToggleTheme}
+              sidebarWidth={sidebarWidth}
+              onWidthChange={handleWidthChange}
+              employeeName={employeeName}
+              employeeRole={employeeRole}
+              onUpdateEmployee={handleUpdateEmployee}
+            />
+          )}
         </main>
       </div>
     </div>

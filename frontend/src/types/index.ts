@@ -2,6 +2,7 @@ export interface Agent {
   name: string;
   role: string;
   status: 'ACTIVE' | 'IDLE' | 'BUSY';
+  model?: string;
   completed_tasks?: number;
   success_rate?: string;
   last_active?: string;
@@ -41,6 +42,7 @@ export interface WorkflowResult {
   verification_status: string;
   all_verified: boolean;
   response_text: string;
+  policy_citations?: string[];
   execution_timeline: ExecutionStep[];
   anomaly_analysis?: AnomalyAnalysis;
   sales_opportunity?: {
@@ -119,3 +121,107 @@ export interface ActivityLog {
   status: string;
   created_at: string;
 }
+
+export type HumanRoleKey =
+  | 'CUSTOMER'
+  | 'SUPPORT_EXECUTIVE'
+  | 'PAYMENT_ANALYST'
+  | 'MERCHANT_EXECUTIVE'
+  | 'SUPERVISOR_ADMIN';
+
+export interface HumanRoleProfile {
+  key: HumanRoleKey;
+  name: string;
+  employeeId: string;
+  roleTitle: string;
+  badge: string;
+  department: string;
+  description: string;
+  allowedModules: string[];
+  canApproveRefunds: boolean;
+  canManageAgents: boolean;
+  canManageSettings: boolean;
+}
+
+export const HUMAN_ROLES_CONFIG: Record<HumanRoleKey, HumanRoleProfile> = {
+  CUSTOMER: {
+    key: 'CUSTOMER',
+    name: 'Rahul Sharma',
+    employeeId: 'CUST101',
+    roleTitle: 'Customer',
+    badge: 'External User',
+    department: 'Consumer Services',
+    description: 'Uses the customer-facing support portal to report and track payment issues with voice/text.',
+    allowedModules: ['customer_portal', 'support'],
+    canApproveRefunds: false,
+    canManageAgents: false,
+    canManageSettings: false,
+  },
+  SUPPORT_EXECUTIVE: {
+    key: 'SUPPORT_EXECUTIVE',
+    name: 'Priya Verma',
+    employeeId: 'EMP101',
+    roleTitle: 'Customer Support Executive',
+    badge: 'Internal Operations',
+    department: 'Customer Care & Triage',
+    description: 'Handles customer complaints, tracks SLAs, reviews AI response drafts, and requests refunds.',
+    allowedModules: ['overview', 'workspace', 'tasks', 'support', 'knowledge'],
+    canApproveRefunds: false,
+    canManageAgents: false,
+    canManageSettings: false,
+  },
+  PAYMENT_ANALYST: {
+    key: 'PAYMENT_ANALYST',
+    name: 'Sai Teja Boini',
+    employeeId: 'EMP201',
+    roleTitle: 'Payment Operations Analyst',
+    badge: 'Core Operations',
+    department: 'Payment Ledgers & Reconciliation',
+    description: 'Investigates payment failures, U69/U30 gateway codes, duplicate debits, and recommends reversals.',
+    allowedModules: ['overview', 'workspace', 'tasks', 'payments', 'knowledge'],
+    canApproveRefunds: false,
+    canManageAgents: false,
+    canManageSettings: false,
+  },
+  MERCHANT_EXECUTIVE: {
+    key: 'MERCHANT_EXECUTIVE',
+    name: 'Ananya Sen',
+    employeeId: 'EMP301',
+    roleTitle: 'Merchant Operations Executive',
+    badge: 'Merchant Operations',
+    department: 'Merchant Help & IoT Devices',
+    description: 'Manages merchant onboarding, settlements, Soundbox/POS telemetry, and business revenue leads.',
+    allowedModules: ['overview', 'workspace', 'tasks', 'merchants', 'leads', 'knowledge'],
+    canApproveRefunds: false,
+    canManageAgents: false,
+    canManageSettings: false,
+  },
+  SUPERVISOR_ADMIN: {
+    key: 'SUPERVISOR_ADMIN',
+    name: 'Rajesh Kumar',
+    employeeId: 'EMP401',
+    roleTitle: 'Supervisor / Administrator',
+    badge: 'Executive Governance',
+    department: 'Operations Governance & Approvals',
+    description: 'Enterprise governance, approval authority for refunds/reversals, agent pause/resume, audit logs, and settings.',
+    allowedModules: [
+      'overview',
+      'teammates',
+      'workspace',
+      'tasks',
+      'support',
+      'payments',
+      'merchants',
+      'leads',
+      'approvals',
+      'logs',
+      'analytics',
+      'knowledge',
+      'settings',
+      'customer_portal',
+    ],
+    canApproveRefunds: true,
+    canManageAgents: true,
+    canManageSettings: true,
+  },
+};

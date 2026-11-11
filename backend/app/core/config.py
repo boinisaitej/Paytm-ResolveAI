@@ -3,15 +3,19 @@
 Ensures strict validation, zero hardcoded credentials, and safe masking of secrets.
 """
 
+from pathlib import Path
 from typing import List, Optional
 import urllib.parse
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_PATH = BACKEND_DIR / ".env"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -50,7 +54,22 @@ class Settings(BaseSettings):
         description="Azure OpenAI API version",
     )
 
-    # Azure SQL Database Configuration
+    # Active Employee Profile (Payment Operations Officer)
+    employee_id: str = Field(default="EMP201", description="Current employee identifier")
+    employee_name: str = Field(default="Sai Teja Boini", description="Full name of employee handling approvals")
+    employee_role: str = Field(default="Lead Payment Operations Officer", description="Role/Designation of current user")
+
+    # Primary Database Configuration: PostgreSQL (Local or Azure Database for PostgreSQL Flexible Server)
+    database_type: str = Field(default="postgresql", description="'postgresql' or 'azuresql'")
+    database_url: Optional[str] = Field(default=None, description="Direct Database Connection URL (e.g. postgresql://user:pass@host:5432/db)")
+    postgres_host: Optional[str] = Field(default=None, description="PostgreSQL host, e.g. localhost or ps-paytm.postgres.database.azure.com")
+    postgres_port: int = Field(default=5432, description="PostgreSQL port")
+    postgres_db: str = Field(default="paytm_resolveai", description="PostgreSQL database name")
+    postgres_user: Optional[str] = Field(default=None, description="PostgreSQL username")
+    postgres_password: Optional[str] = Field(default=None, description="PostgreSQL password")
+    postgres_sslmode: str = Field(default="prefer", description="SSL mode: disable, prefer, require")
+
+    # Azure SQL Database Configuration (Alternative Enterprise RDBMS)
     azure_sql_server: Optional[str] = Field(
         default=None,
         description="Azure SQL Server hostname (e.g. sql-paytm.database.windows.net)",
@@ -104,6 +123,21 @@ class Settings(BaseSettings):
         return bool(self.azure_openai_endpoint and (self.azure_openai_api_key or self.app_env != "development"))
 
     @property
+    def is_azure_search_configured(self) -> bool:
+        """Checks if Azure AI Search endpoint is populated."""
+        return bool(self.azure_search_endpoint and (self.azure_search_api_key or self.app_env != "development"))
+
+    @property
+    def is_azure_storage_configured(self) -> bool:
+        """Checks if Azure Blob Storage account is populated."""
+        return bool(self.azure_storage_account and (self.azure_storage_key or self.app_env != "development"))
+
+    @property
+    def is_postgres_configured(self) -> bool:
+        """Checks if PostgreSQL connection settings or full DATABASE_URL are provided."""
+        return bool(self.database_url or (self.postgres_host and self.postgres_user and self.postgres_password))
+
+    @property
     def is_azure_sql_configured(self) -> bool:
         """Checks if all required Azure SQL connection credentials are provided."""
         return bool(
@@ -112,6 +146,20 @@ class Settings(BaseSettings):
             and self.azure_sql_user
             and self.azure_sql_password
         )
+
+    def get_database_url(self) -> str:
+        """Returns the primary SQLAlchemy connection URL (PostgreSQL by default, or Azure SQL)."""
+        if self.database_url:
+            return self.database_url
+
+        if self.database_type == "postgresql" and self.is_postgres_configured:
+            encoded_password = urllib.parse.quote_plus(self.postgres_password or "")
+            return f"postgresql+psycopg2://{self.postgres_user}:{encoded_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}?sslmode={self.postgres_sslmode}"
+
+        if self.is_azure_sql_configured:
+            return self.get_sqlalchemy_database_url()
+
+        return ""
 
     def get_sqlalchemy_database_url(self) -> str:
         """Generates a secure, pyodbc-compatible SQLAlchemy URL for Azure SQL Database."""

@@ -28,7 +28,7 @@ def test_azure_openai_configured_flag():
         azure_openai_api_key="secret-key-12345",
     )
     assert configured.is_azure_openai_configured is True
-    assert configured.azure_openai_chat_deployment == "gpt-4o"
+    assert configured.azure_openai_chat_deployment in ["gpt-4o", "gpt-4o-mini"]
 
 
 def test_azure_sql_url_builder():

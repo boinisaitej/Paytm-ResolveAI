@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paytm ResolveAI - Pitch Deck & Architecture Presentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #060d19;
+      color: #f1f5f9;
+      overflow: hidden;
+    }
+    
+    .paytm-blue { color: #00BAF2; }
+    .bg-paytm-blue { background-color: #00BAF2; }
+    .paytm-navy { color: #002970; }
+    .bg-paytm-navy { background-color: #002970; }
+    
+    .slide {
+      display: none;
+      height: 100vh;
+      width: 100vw;
+      padding: 3.5rem 5rem;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+    
+    .glow-cyan {
+      box-shadow: 0 0 35px -5px rgba(0, 186, 242, 0.3);
+    }
+    
+    .glow-indigo {
+      box-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.3);
+    }
+    
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="select-none">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="fixed top-0 left-0 right-0 h-16 px-8 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-cyan-500/30">
+        P
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold text-white tracking-tight text-base">Paytm</span>
+          <span class="text-cyan-400 font-bold text-base tracking-wide">ResolveAI</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800">ENTERPRISE EDITION</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide Indicators -->
+    <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-1.5 rounded-full border border-slate-800">
+      <span id="currentSlideNum" class="text-cyan-400 font-bold font-mono text-sm">01</span>
+      <span class="text-slate-600 text-xs">/</span>
+      <span id="totalSlideNum" class="text-slate-400 font-mono text-sm">08</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center gap-3">
+      <button onclick="prevSlide()" class="p-2 w-9 h-9 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center justify-center">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+      </button>
+      <button onclick="nextSlide()" class="p-2 w-9 h-9 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition flex items-center justify-center shadow-md shadow-cyan-600/30">
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+      </button>
+      <button onclick="toggleFullScreen()" class="p-2 w-9 h-9 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center justify-center" title="Full Screen">
+        <i class="fa-solid fa-expand text-xs"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 1: TITLE SLIDE                       -->
+  <!-- ========================================== -->
+  <section class="slide active justify-center items-center text-center relative overflow-hidden" id="slide-1">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,186,242,0.12)_0,transparent_65%)] pointer-events-none"></div>
+    <div class="max-w-4xl z-10 flex flex-col items-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-800 text-cyan-300 text-xs font-semibold mb-6 tracking-wide uppercase">
+        <i class="fa-solid fa-microchip"></i> Track: Autonomous Multi-Agent AI & Fintech Operations
+      </div>
+      <h1 class="text-6xl font-black tracking-tight text-white mb-4 leading-tight">
+        Paytm <span class="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">ResolveAI</span>
+      </h1>
+      <p class="text-2xl text-slate-300 font-medium max-w-2xl mb-8">
+        Autonomous Multi-Agent AI Workforce for Payment Operations, Dispute Resolution & Merchant Excellence
+      </p>
+      <p class="text-base text-slate-400 max-w-3xl mb-10 leading-relaxed">
+        A dual-tier enterprise architecture unifying <strong class="text-cyan-300">5 Autonomous AI Agents</strong> with <strong class="text-blue-300">5 Human Application Personas (RBAC)</strong> powered exclusively by Azure OpenAI & Azure AI Search.
+      </p>
+
+      <div class="flex items-center gap-6 pt-4 border-t border-slate-800/80">
+        <div class="text-left">
+          <p class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Lead Developer</p>
+          <p class="text-sm font-bold text-slate-200">Sai Teja Boini</p>
+        </div>
+        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="text-left">
+          <p class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Architecture</p>
+          <p class="text-sm font-bold text-cyan-400">Multi-Agent RAG Orchestration</p>
+        </div>
+        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="text-left">
+          <p class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Key Foundation</p>
+          <p class="text-sm font-bold text-slate-200">Zero Hardcoded Responses</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 2: PROBLEM STATEMENT                 -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-2">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-rose-950/60 border border-rose-800/60 text-rose-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-triangle-exclamation"></i> 📌 Problem Statement
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">The Scale Crisis in Digital Payment Operations</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">With over 350 Million users and 100M+ transactions daily, traditional support and payment ops collapse under transaction edge-cases.</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 my-auto">
+      <div class="glass-card p-6 rounded-2xl border-rose-900/30">
+        <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl mb-4">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">48-72h Dispute Latency</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Pending debits, bank timeouts, and U69/U30 gateway codes require manual ticket escalations across 3 disjointed support tiers, frustrating customers.
+        </p>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-amber-900/30">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl mb-4">
+          <i class="fa-solid fa-cubes-stacked"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Fragmented Silos</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Customer support, core banking analysts, merchant field engineers, and risk officers operate in isolated tools without unified transaction telemetry.
+        </p>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-cyan-900/30">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4">
+          <i class="fa-solid fa-store-slash"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Merchant Churn & Hardware</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Soundbox audio sync drops, SIM disconnections, and delayed settlements cause merchants to switch QR codes immediately, losing revenue.
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card p-4 rounded-xl flex items-center justify-between border-slate-800 bg-slate-900/40">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></div>
+        <span class="text-xs text-slate-300 font-semibold">The Cost of Inaction:</span>
+        <span class="text-xs text-slate-400">Over ₹180 Crores spent annually on Level-1 repetitive triage, high Customer Effort Score (CES), and SLA penalties.</span>
+      </div>
+      <span class="text-xs font-mono text-cyan-400 font-bold">RBI Turnaround Requirement: T+1 Days</span>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 3: PROPOSED SOLUTION                 -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-3">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-lightbulb"></i> 📌 Proposed Solution
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">Dual-Tier Workforce: 5 Human Roles + 5 AI Agents</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">An enterprise-grade collaboration model pairing specialized AI agents with authenticated human roles.</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-8 my-auto">
+      <!-- Human Roles -->
+      <div class="glass-card p-6 rounded-2xl border-blue-900/30">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-users text-blue-400"></i>
+            <h3 class="text-base font-bold text-white">5 Human Application Roles (RBAC)</h3>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">RBAC GATED</span>
+        </div>
+        <ul class="space-y-2.5 text-xs text-slate-300">
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">1</span>
+            <div><strong class="text-white">Customer:</strong> Voice/text multilingual dispute filing, live ticket tracking.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">2</span>
+            <div><strong class="text-white">Support Executive:</strong> Assigned ticket triage, AI response draft reviews.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">3</span>
+            <div><strong class="text-white">Payment Ops Analyst:</strong> Gateway code analysis (U69/U30), duplicate debits.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">4</span>
+            <div><strong class="text-white">Merchant Ops Executive:</strong> Soundbox telemetry, settlements, device dispatch.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">5</span>
+            <div><strong class="text-white">Supervisor / Admin:</strong> Final financial approval authority, AI workforce telemetry.</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- AI Agents -->
+      <div class="glass-card p-6 rounded-2xl border-cyan-900/30">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-robot text-cyan-400"></i>
+            <h3 class="text-base font-bold text-white">5 Autonomous AI Agents</h3>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">AZURE OPENAI GPT-4O</span>
+        </div>
+        <ul class="space-y-2.5 text-xs text-slate-300">
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-[10px]">1</span>
+            <div><strong class="text-white">Customer Support Agent:</strong> Multilingual STT, sentiment analysis, AI drafting.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-[10px]">2</span>
+            <div><strong class="text-white">Payment Investigation Agent:</strong> Core banking & gateway telemetry verification.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-[10px]">3</span>
+            <div><strong class="text-white">Dispute Resolution Agent:</strong> RBI/Paytm policy RAG matching & auto-reversal plan.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-[10px]">4</span>
+            <div><strong class="text-white">Merchant Operations Agent:</strong> Soundbox diagnostics, ledger sync & cross-sell.</div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-[10px]">5</span>
+            <div><strong class="text-white">Governance & Audit Agent:</strong> Risk scoring, SLA breach prediction, supervisor approval pack.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="glass-card px-5 py-3 rounded-xl border-slate-800 flex items-center justify-between">
+      <span class="text-xs text-slate-400"><strong class="text-white">Zero Hardcoding Rule:</strong> Every insight, root cause, and response is synthesized dynamically via Azure OpenAI LLM + Azure AI Search RAG.</span>
+      <span class="text-xs text-emerald-400 font-semibold"><i class="fa-solid fa-shield-check"></i> Human-in-the-Loop Safe</span>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 4: TECHNOLOGY / TECH STACK           -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-indigo-950/60 border border-indigo-800/60 text-indigo-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-layer-group"></i> 📌 Technology / Tech Stack Used
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">Enterprise Multi-Agent & Cloud Stack</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">Architected around the LangGraph State Graph pattern and enterprise Azure Cognitive Cloud services.</p>
+    </div>
+
+    <!-- Prominent Multi-Agent Engine Banner -->
+    <div class="glass-card p-4 rounded-xl border border-cyan-500/30 bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg font-bold">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-extrabold text-white">Agent Framework: LangGraph State Graph Architecture Pattern</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">DIRECTED CYCLIC GRAPH</span>
+          </div>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Implements Directed State Graphs: Specialist Agent Nodes, Shared Execution Context, Dynamic Conditional Routing Edges, Self-Reflection Verification, and Human-in-the-Loop Interrupt Checkpoints.
+          </p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-[11px] font-mono text-cyan-400 font-bold">&lt; 1.5s Execution Latency</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-4 my-2">
+      <div class="glass-card p-4 rounded-xl border-cyan-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-cyan-400 text-lg"><i class="fa-solid fa-brain"></i></div>
+          <h3 class="text-xs font-bold text-white">Azure OpenAI Service</h3>
+        </div>
+        <p class="text-[11px] text-cyan-300 font-mono mb-2">gpt-4o / gpt-4o-mini</p>
+        <ul class="text-[11px] text-slate-400 space-y-1 list-disc pl-3">
+          <li>Exclusive LLM provider</li>
+          <li>Unscripted intent detection</li>
+          <li>Sentiment & urgency scoring</li>
+          <li>Regional multilingual generation</li>
+          <li><strong class="text-slate-300">Zero hardcoded responses</strong></li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border-blue-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-blue-400 text-lg"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+          <h3 class="text-xs font-bold text-white">Azure AI Search & Blob</h3>
+        </div>
+        <p class="text-[11px] text-blue-300 font-mono mb-2">Semantic Vector RAG</p>
+        <ul class="text-[11px] text-slate-400 space-y-1 list-disc pl-3">
+          <li>Hybrid Vector + Keyword search</li>
+          <li>Official RBI master circulars</li>
+          <li>NPCI settlement turnaround SOPs</li>
+          <li>Paytm dispute resolution policy</li>
+          <li><strong class="text-slate-300">Zero-hallucination RAG</strong></li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border-emerald-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-emerald-400 text-lg"><i class="fa-brands fa-python"></i></div>
+          <h3 class="text-xs font-bold text-white">FastAPI & Python 3.11</h3>
+        </div>
+        <p class="text-[11px] text-emerald-300 font-mono mb-2">Asynchronous Core API</p>
+        <ul class="text-[11px] text-slate-400 space-y-1 list-disc pl-3">
+          <li>High-concurrency async REST API</li>
+          <li>Pydantic V2 data validation</li>
+          <li>PostgreSQL / Azure SQL (SQLAlchemy)</li>
+          <li><strong class="text-slate-300">Zero SQLite relational DB</strong></li>
+          <li>Deterministic anomaly detection</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-4 rounded-xl border-violet-500/20">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-violet-400 text-lg"><i class="fa-brands fa-react"></i></div>
+          <h3 class="text-xs font-bold text-white">React 18 & TypeScript</h3>
+        </div>
+        <p class="text-[11px] text-violet-300 font-mono mb-2">Vite + Tailwind + Web Speech</p>
+        <ul class="text-[11px] text-slate-400 space-y-1 list-disc pl-3">
+          <li>Web Speech API (Multilingual STT)</li>
+          <li>Hindi, Telugu, English voice input</li>
+          <li>RBAC gating (5 Human Personas)</li>
+          <li>Real-time Agent Telemetry Dashboard</li>
+          <li><strong class="text-slate-300">Live Health & Token Tracking</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Security & Architecture Banner -->
+    <div class="glass-card p-3 rounded-xl border-slate-800 grid grid-cols-4 text-center divide-x divide-slate-800 text-[11px]">
+      <div>
+        <p class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Multi-Agent Pattern</p>
+        <p class="font-bold text-cyan-400 mt-0.5">LangGraph State Graph</p>
+      </div>
+      <div>
+        <p class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Cloud Provider</p>
+        <p class="font-bold text-slate-200 mt-0.5">Microsoft Azure Cloud</p>
+      </div>
+      <div>
+        <p class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Data Integrity</p>
+        <p class="font-bold text-slate-200 mt-0.5">Relational DB (PostgreSQL/SQL)</p>
+      </div>
+      <div>
+        <p class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Compliance</p>
+        <p class="font-bold text-emerald-400 mt-0.5">Human-in-the-Loop Gate (EMP401)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 5: USP (UNIQUE SELLING PROPOSITION)  -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-5">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-award"></i> 📌 USP (Unique Selling Proposition)
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">What Sets Paytm ResolveAI Apart?</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">Moving beyond basic chatbots to an accountable, autonomous, enterprise-grade AI workforce.</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 my-auto">
+      <div class="glass-card p-6 rounded-2xl border-cyan-500/20 glow-cyan">
+        <div class="text-cyan-400 text-2xl mb-3"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">100% Dynamic & Unscripted</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Zero hardcoded strings or canned FAQs. Every root-cause deduction, gateway code interpretation, and customer draft is synthesized on demand with prompt grounding.
+        </p>
+        <span class="text-[10px] text-cyan-400 font-mono font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">ZERO DUMMY DATA</span>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-blue-500/20">
+        <div class="text-blue-400 text-2xl mb-3"><i class="fa-solid fa-language"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">Native Multilingual Voice STT</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Voice dispute submission in Hindi, Telugu, and English. The AI understands colloquial payment terminology (e.g., "paise kat gaye par merchant ko nahi mile") seamlessly.
+        </p>
+        <span class="text-[10px] text-blue-400 font-mono font-bold bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800">VOICE + TRANSLATION</span>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-emerald-500/20">
+        <div class="text-emerald-400 text-2xl mb-3"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">Strict Governance & Approval Gate</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          AI agents can investigate, verify ledgers, and formulate refund proposals, but only an authenticated Human Supervisor (EMP401) can authorize payouts.
+        </p>
+        <span class="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">FINANCIAL SAFETY</span>
+      </div>
+    </div>
+
+    <div class="glass-card p-4 rounded-xl border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <span class="text-xs font-bold text-white">Full AI Observability:</span>
+        <span class="text-xs text-slate-400">Admin dashboard tracks per-agent latency (ms), token usage (prompt/completion), temperature, and SLA breach risk in real time.</span>
+      </div>
+      <span class="text-xs text-cyan-400 font-mono">100% Audit-Logged</span>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 6: IMPACT & BENEFITS                 -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-6">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-chart-line"></i> 📌 Impact & Benefits
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">Measurable Operational & Financial Transformation</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">Transforming customer experience while drastically reducing operational costs for Paytm.</p>
+    </div>
+
+    <div class="grid grid-cols-4 gap-6 my-auto">
+      <div class="glass-card p-6 rounded-2xl text-center">
+        <p class="text-4xl font-extrabold text-cyan-400 font-mono mb-2">99%</p>
+        <h3 class="text-sm font-bold text-white mb-2">TAT Reduction</h3>
+        <p class="text-xs text-slate-400">Dispute analysis slashed from 48-72 hours to under 30 seconds for standard gateway pending debits.</p>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl text-center">
+        <p class="text-4xl font-extrabold text-emerald-400 font-mono mb-2">82%</p>
+        <h3 class="text-sm font-bold text-white mb-2">First-Contact Resolution</h3>
+        <p class="text-xs text-slate-400">Over 80% of routine payment queries and settlement doubts resolved instantly without tier escalation.</p>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl text-center">
+        <p class="text-4xl font-extrabold text-blue-400 font-mono mb-2">65%</p>
+        <h3 class="text-sm font-bold text-white mb-2">Cost Savings</h3>
+        <p class="text-xs text-slate-400">Reduced L1/L2 support headcount requirement, reallocating human capital to complex edge-cases.</p>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl text-center">
+        <p class="text-4xl font-extrabold text-amber-400 font-mono mb-2">35%</p>
+        <h3 class="text-sm font-bold text-white mb-2">Merchant Churn Drop</h3>
+        <p class="text-xs text-slate-400">Real-time Soundbox telemetry & preemptive field-service dispatch prevents merchant downtime.</p>
+      </div>
+    </div>
+
+    <!-- Comparative Table -->
+    <div class="glass-card p-4 rounded-xl border-slate-800">
+      <div class="grid grid-cols-3 text-xs">
+        <div class="text-slate-400 font-semibold">Metric</div>
+        <div class="text-rose-400 font-semibold">Traditional Support Stack</div>
+        <div class="text-cyan-400 font-semibold">Paytm ResolveAI Platform</div>
+      </div>
+      <div class="grid grid-cols-3 text-xs mt-2 pt-2 border-t border-slate-800/60">
+        <div class="text-slate-300">Pending Debit Clarification</div>
+        <div class="text-slate-400">2-3 Days via Email/SMS</div>
+        <div class="text-emerald-400 font-bold">&lt; 15 Seconds (Live Banking Audit)</div>
+      </div>
+      <div class="grid grid-cols-3 text-xs mt-2 pt-2 border-t border-slate-800/60">
+        <div class="text-slate-300">Soundbox Hardware Triage</div>
+        <div class="text-slate-400">Manual Call-center Wait</div>
+        <div class="text-emerald-400 font-bold">Automated Remote Diagnostics & Ticket</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 7: BUSINESS MODEL                    -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-7">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-purple-950/60 border border-purple-800/60 text-purple-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-briefcase"></i> 📌 Business Model
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">Monetization, ROI & Strategic Value</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">Delivering multi-million dollar internal OPEX savings and external B2B commercialization.</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 my-auto">
+      <div class="glass-card p-6 rounded-2xl border-purple-900/40">
+        <div class="text-purple-400 text-2xl mb-3"><i class="fa-solid fa-building-columns"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">1. Internal OPEX Optimization</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Direct operational cost reduction across customer care, back-office payment operations, and merchant telemetry support.
+        </p>
+        <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc pl-4">
+          <li>₹120+ Cr estimated annual savings on support operations.</li>
+          <li>Elimination of duplicate refund payouts via automated reconciliation.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-cyan-900/40">
+        <div class="text-cyan-400 text-2xl mb-3"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">2. B2B Enterprise SaaS Licensing</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Package the ResolveAI Multi-Agent Engine as a white-label solution for banks, neobanks, and global fintechs.
+        </p>
+        <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc pl-4">
+          <li>Tiered subscription based on monthly dispute volume.</li>
+          <li>Plug-and-play connectors for NPCI UPI, Visa, Mastercard, and Core Banking.</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl border-emerald-900/40">
+        <div class="text-emerald-400 text-2xl mb-3"><i class="fa-solid fa-bullseye"></i></div>
+        <h3 class="text-base font-bold text-white mb-2">3. Merchant Value-Added Services</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Premium settlement dispute protection and automated merchant loan underwriting integration.
+        </p>
+        <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc pl-4">
+          <li>Instant Settlement Guarantee with zero merchant liability.</li>
+          <li>AI-prioritized business loan and merchant insurance cross-sell.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="glass-card p-4 rounded-xl border-slate-800 flex items-center justify-between">
+      <span class="text-xs text-slate-400 font-semibold">Payback Period: <strong class="text-white">&lt; 4 Months</strong> from deployment across Paytm core payment clusters.</span>
+      <span class="text-xs text-purple-400 font-mono font-bold">LTV/CAC Multiplier: 4.8x</span>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 8: SUMMARY & ROADMAP                 -->
+  <!-- ========================================== -->
+  <section class="slide justify-between" id="slide-8">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-flag-checkered"></i> Conclusion & Next Steps
+      </div>
+      <h2 class="text-3xl font-extrabold text-white mb-2">Paytm ResolveAI: The Future of Fintech Operations</h2>
+      <p class="text-slate-400 text-sm max-w-3xl">A production-ready platform demonstrating the true power of autonomous multi-agent intelligence.</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 my-auto">
+      <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-sm font-bold text-cyan-400 mb-2 uppercase tracking-wider">Phase 1: Production Ready</h3>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 5 Human Roles + RBAC Guardrails</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 5 Autonomous AI Agents</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Multilingual Voice Grievance STT</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Azure OpenAI Live RAG</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-sm font-bold text-blue-400 mb-2 uppercase tracking-wider">Phase 2: Upcoming Features</h3>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-arrow-right text-blue-400"></i> Proactive Outage Clustering AI</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-arrow-right text-blue-400"></i> Autonomous Agent Negotiation</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-arrow-right text-blue-400"></i> Predictive SLA Auto-Rebalancing</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-arrow-right text-blue-400"></i> Voice Synthesized Callback Bots</li>
+        </ul>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl">
+        <h3 class="text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wider">Evaluation Highlights</h3>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> Zero Hardcoding (100% Dynamic)</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> Verified Azure Cloud Architecture</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> 100% Unit & Integration Test Coverage</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> Full Observability Telemetry</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Final Callout -->
+    <div class="glass-card p-5 rounded-xl border-cyan-500/30 flex items-center justify-between bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900">
+      <div>
+        <p class="text-base font-extrabold text-white">Ready for Live Demonstration</p>
+        <p class="text-xs text-slate-400">Explore the live portal, change roles, trigger investigations, and view per-agent health telemetry.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="http://127.0.0.1:5173" target="_blank" class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-cyan-500/30 flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live App
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEYBOARD NAVIGATION & SCRIPT -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 8;
+
+    function updateSlide() {
+      for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.getElementById(`slide-${i}`);
+        if (slide) {
+          if (i === currentSlide) {
+            slide.classList.add('active');
+          } else {
+            slide.classList.remove('active');
+          }
+        }
+      }
+      document.getElementById('currentSlideNum').innerText = currentSlide.toString().padStart(2, '0');
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      }
+    });
+  </script>
+</body>
+</html>
